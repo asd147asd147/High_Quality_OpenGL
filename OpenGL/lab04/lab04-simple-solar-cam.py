@@ -7,6 +7,9 @@ import numpy as np
 
 import SimCamera
 
+IsZoom = True
+ZoomSize = 1.0
+
 WINDOW_WIDTH = 600
 WINDOW_HEIGHT = 600
 WINDOW_POSITION_X = 0
@@ -57,8 +60,9 @@ def disp() :
     glViewport(WINDOW_POSITION_X,WINDOW_POSITION_Y,WINDOW_WIDTH,WINDOW_HEIGHT)
     #gluLookAt(10,20,60, 0,0,0, 0,1,0)
 
-    myCam.setCameraLoc(np.array([0,20,40]))
-    #myCam.setCameraLoc([10,20,60])
+    #myCam.setCameraLoc(np.array([0,20,40]))
+    myCam.setCameraLoc([10,20,60])
+
     myCam.applyCamera()
     drawScene()
     

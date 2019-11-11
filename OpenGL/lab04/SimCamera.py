@@ -70,13 +70,6 @@ class Camera :
     def moveBackward(self, step=1.0):
         self.moveForward(-step)
 
-    def moveForward(self, step=1.0):
-        self.tar += self.dir * step
-        self.loc += self.dir * step
-
-    def moveBackward(self, step=1.0):
-        self.moveForward(-step)
-
     def moveRight(self, step=1.0):
         self.tar += self.right * step
         self.loc += self.right * step
