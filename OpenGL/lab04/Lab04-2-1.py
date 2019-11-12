@@ -4,29 +4,40 @@ from OpenGL.GLU import *
 
 import numpy as np
 from PIL import Image
+from math import *
 
 time = 0
 
-nTex = 4
+nTex = 6
 texArr = None
-vertices=[#정점의 좌표
-        -0.25,-0.25,0.25,
-        -0.25,0.25,0.25,
-        0.25,0.25,0.25,
-        0.25,-0.25,0.25,
-        -0.25,-0.25,-0.25,
-        -0.25,0.25,-0.25,
-        0.25,0.25,-0.25,
-        0.25,-0.25,-0.25,
-        ]
-indices=[ #정점 리스트 : 6면을 4개의 정점으로 한 면을 정의함
-        0,3,2,1,
-        2,3,7,6,
-        0,4,7,3,
-        1,2,6,5,
-        4,5,6,7,
-        0,1,5,4,
-        ]
+
+angle_x = 0.0
+angle_y = 0.0
+r_x = 0.0
+r_y = 1.0
+
+def processNormalKeys(key,x,y):
+    if(key == 27):
+        exit(0)
+
+def processSpecialKeys(key,x,y):
+    global angle_x, angle_y, r_x, r_y
+    if(key == GLUT_KEY_LEFT):
+        angle_x += 0.1
+        r_y = 1.0
+        r_x = 0.0
+    elif(key == GLUT_KEY_RIGHT):
+        angle_x -= 0.1
+        r_y = 1.0
+        r_x = 0.0
+    elif (key == GLUT_KEY_UP):
+        angle_y += 10
+        r_x = 1.0
+        r_y = 0.0
+    elif (key == GLUT_KEY_DOWN):
+        angle_y -= 10
+        r_x = 1.0
+        r_y = 0.0
 
 def loadImage(imageName) :
     img = Image.open(imageName)
@@ -37,7 +48,7 @@ def setTexture(texArr, idx, fileName, option):
 
     glBindTexture(GL_TEXTURE_2D, texArr[idx])
     imgW, imgH, myImage = loadImage(fileName)
-    print(imgW, imgH, myImage)
+    #print(imgW, imgH, myImage)
 
     # texture image 생성
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
@@ -56,10 +67,10 @@ def setTexture(texArr, idx, fileName, option):
 
 
 
-def drawQuad(x,y,z, angle) :
+def drawQuad(x,y,z, angle, a_x, a_y, a_z) :
     glPushMatrix()
     glTranslatef(x,y,z)
-    glRotatef(angle, 1,1,1)
+    glRotatef(angle, a_x, a_y, a_z)
     glBegin(GL_QUADS)
     glTexCoord2f(0,0)
     glVertex3fv([-1, 1, 0])
@@ -87,21 +98,36 @@ def myDisplay():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 0, 5, 0, 0, 0, 0, 1, 0)
-
+    gluLookAt(0,0,5, 0,0,0, 0,1,0)
+    if(r_y == 1.0):
+        gluLookAt(3.0 * cos(angle_x), 0, 3.0 * sin(angle_x),  # 카메라위치->perspective때는허용됨
+                  0.0, 0.0, -1.0,  # 초점
+                  0.0, 1.0, 0.0)  # 카메라방향
+    elif(r_x == 1.0):
+        glRotatef(angle_y, 1, 0, 0)  # 카메라방향
     time += 0.1
 
+
     glBindTexture(GL_TEXTURE_2D, texArr[0])
-    drawQuad(-1, 1, 0, time)
+    drawQuad(-1, 0, -1, -90, 0, 1, 0) #left
     glBindTexture(GL_TEXTURE_2D, texArr[1])
-    drawQuad(1, 1, 0, time)
+    drawQuad( 1, 0, -1, 90, 0, 1, 0) #right
     glBindTexture(GL_TEXTURE_2D, texArr[2])
-    drawQuad(-1, -1, 0, time)
+    drawQuad( 0, 0, 0, 0, 0, 0, 0) #front
     glBindTexture(GL_TEXTURE_2D, texArr[3])
-    drawQuad(1, -1, 0, time)
+    drawQuad( 0, 1, -1, -90, 1, 0, 0) #up
+    glBindTexture(GL_TEXTURE_2D, texArr[4])
+    drawQuad(0, -1, -1, 90, 1, 0, 0) #down
+    glBindTexture(GL_TEXTURE_2D, texArr[5])
+    drawQuad(0, 0, -2, 180, 1, 0, 0) #behind
+
+    gluLookAt(cos(time),1,sin(time), #카메라위치->perspective때는허용됨
+              0.0, 0.0, 0.0,#초점
+              0.0,1.0, 0.0) #카메라방향
 
     glFlush()
 
+    return
 
 def GLInit() :
     global nTex, texArr
@@ -114,6 +140,8 @@ def GLInit() :
     setTexture(texArr, 1, "pnu02.jpg", GL_RGB)
     setTexture(texArr, 2, "pnu03.jpg", GL_RGB)
     setTexture(texArr, 3, "pnu04.jpg", GL_RGB)
+    setTexture(texArr, 4, "pnu05.jpg", GL_RGB)
+    setTexture(texArr, 5, "pnu06.jpg", GL_RGB)
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     glEnable(GL_TEXTURE_2D)
@@ -129,6 +157,8 @@ def main(arg) :
     glutInitWindowPosition(100, 100)
     glutCreateWindow(b"Texture")
 
+    glutKeyboardFunc(processNormalKeys)
+    glutSpecialFunc(processSpecialKeys)
     GLInit()
 
     glutReshapeFunc(myReshape)
