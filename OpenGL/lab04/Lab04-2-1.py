@@ -17,10 +17,6 @@ angle_y = 0.0
 r_x = 0.0
 r_y = 1.0
 
-def processNormalKeys(key,x,y):
-    if(key == 27):
-        exit(0)
-
 def processSpecialKeys(key,x,y):
     global angle_x, angle_y, r_x, r_y
     if(key == GLUT_KEY_LEFT):
@@ -156,9 +152,8 @@ def main(arg) :
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH)
     glutInitWindowSize(600,600)
     glutInitWindowPosition(100, 100)
-    glutCreateWindow("Texture")
+    glutCreateWindow(b"Texture")
 
-    glutKeyboardFunc(processNormalKeys)
     glutSpecialFunc(processSpecialKeys)
     GLInit()
 
